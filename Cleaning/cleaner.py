@@ -1,66 +1,50 @@
-import csv
-from collections import Counter, defaultdict
-
-#fix missing age without 3rd party libraries
-
-def read_csv(file_path):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-        header = lines[0].strip().split(',')
-        data = [line.strip().split(',') for line in lines[1:]]
-        return header, data
-
-fact_csv = read_csv('../../datasets/test.csv')
-
-#print(fact_csv[0])
+import sys
+sys.path.append("../packages/main/")  # Ensure the path is correct
+from main import read_csv, write_csv, drop_columns, convert_xml_to_csv, convert_json_to_csv
+sys.path.append("../packages/factCleaner/")  # Ensure the path is correct
+from factCleaner import fix_age_height_country
+from handRankCleaner import fix_hand_and_rankpoints, fix_rank_by_tourney
+sys.path.append("../packages/tourneyCleaner/")  # Ensure the path is correct
+from tourneyFunctions import fix_surface, fix_draw_size
 
 
-def fix_age(data):
-    #get a dictionary and store the age of each player
-    age_data = defaultdict(list)
-
-    for row in data:
+#convert other datasets to csv
+convert_xml_to_csv('../datasets/countries.xml')
+convert_json_to_csv('../datasets/tourney.json')
         
-        print("Row Data ----?"  , row)
-        player_id = row[1]
-        # Collect AGE data
-        if row[8] not in ['UNKNOWN', 'N/A', '', None]:
-            try:
-                print("Age is -- " ,row[8])
-                age_data[1].append(float(row[8]))
-            except ValueError:
-                pass
-    
-    # Calculate the average age for each player
-    average_age = {player_id: sum(ages) / len(ages) for player_id, ages in age_data.items()}
+data, header = read_csv('../datasets/fact.csv')
 
-    # Replace 'UNKNOWN' with the average age for each player
-    for row in data:
-        player_id = row[1]
-        if row[8] == 'UNKNOWN':
-            row[8] = average_age.get(player_id, 'UNKNOWN')
-        elif row[8] == 'N/A':
+#colmns with more that 70% missing values.. 
+cols_to_remove = ['winner_entry', 'loser_seed', 'minutes', 'w_SvGms', 'l_SvGms',
+                   'w_1stWon', 'l_ace', 'w_2ndWon', 'w_1stIn', 'w_svpt', 'w_df',
+                   'w_bpSaved', 'w_bpFaced', 'l_svpt', 'l_1stIn', 'l_1stWon',
+                   'l_2ndWon', 'l_bpSaved', 'l_bpFaced', 'w_ace', 'l_df',
+                   'loser_entry', 'winner_seed']
 
-            row[8] = average_age.get(player_id, 'N/A')
-        elif row[8] == '':
-            row[8] = average_age.get(player_id, '')
-        elif row[8] == None:
-            row[8] = average_age.get(player_id, None)
-        else:
-            row[8] = row[8]
-    return data 
+fact_csv, updated_headers = drop_columns(data, cols_to_remove)
+
+clean_v1 = fix_age_height_country(fact_csv)
+print("...... Age and Height Imputation Done !!!! . .. ... .. .. .. .. .. .. .. .. ..")
+
+clean_v2= fix_hand_and_rankpoints(clean_v1)
+print("...... Hand an RankPoints Imputation Done !!!! . .. ... .. .. .. .. .. .. .. .. ..")
+
+clean_v3 = fix_rank_by_tourney(clean_v2)
+print("...... Player Rank Imputation Done !!!! . .. ... .. .. .. .. .. .. .. .. ..")
+
+#print("Data ----?"  , clean_v2)
+print("...... la Laa Laaaaaaaaa !!!! . .. ... .. .. .. .. .. .. .. .. ..")
+write_csv('../datasets/cleaned/fact.csv', updated_headers, clean_v3)
 
 
-def write_csv(file_path, header, data):
-    with open(file_path, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(header)
-        for row in data:
-            writer.writerow(row.values())   
+print(". !!!! Aspertaaaaa lets fix the tourney dataset quick... .. .. .. .. .. .. .. .. ..")
+tourney_data, tourney_header = read_csv('./tourney.csv') #chnage later and use datatset file
+print("...... Tourney Dataset Loaded !!!! . .. ... .. .. .. .. .. .. .. .. ..")
 
+clean_tourney_v1 = fix_surface(tourney_data)
 
-tes2 =  fix_age(fact_csv[1])
-write_csv('../../datasets/test2.csv', tes2[0], tes2[1])
+clean_tourney_v2 = fix_draw_size(clean_tourney_v1)
+print("...... Tourney Dataset Cleaned !!!! . .. ... .. .. .. .. .. .. .. .. ..")
 
+write_csv('../datasets/cleaned/tourney.csv', tourney_header, clean_tourney_v2)
 
-    
