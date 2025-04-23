@@ -35,9 +35,9 @@ print("...... Fact Dimension Table Created !!!! . .. ... .. .. .. .. .. .. .. ..
 #                EXTRACT DATE DIMENSION TABLE FOR TOURNEY DATASET                   #
 #                                                                                   #
 #####################################################################################
-date_dim = create_date_dimension_from_tourney(touney_csv)   
-write_csv('./dimension tables/date_dim.csv', date_dim[0].keys(), date_dim)
-print("...... Date Dimension Table Created !!!! . .. ... .. .. .. .. .. .. .. .. ..")
+#date_dim = create_date_dimension_from_tourney(touney_csv)   
+#write_csv('./dimension tables/date_dim.csv', date_dim[0].keys(), date_dim)
+#print("...... Date Dimension Table Created !!!! . .. ... .. .. .. .. .. .. .. .. ..")
 
 #####################################################################################
 #                                                                                   #
@@ -47,9 +47,9 @@ print("...... Date Dimension Table Created !!!! . .. ... .. .. .. .. .. .. .. ..
 #                                                                                   #
 #####################################################################################
 
-tourney_dim = transform_tourney_dimension(touney_csv, date_dim)
-write_csv('./dimension tables/tourney_dim.csv', tourney_dim[0].keys(), tourney_dim)
-print("...... Tourney Dimension Table Created !!!! . .. ... .. .. .. .. .. .. .. .. ..")
+#tourney_dim = transform_tourney_dimension(touney_csv, date_dim)
+#write_csv('./dimension tables/tourney_dim.csv', tourney_dim[0].keys(), tourney_dim)
+#print("...... Tourney Dimension Table Created !!!! . .. ... .. .. .. .. .. .. .. .. ..")
 
 #####################################################################################
 #                                                                                   #
@@ -57,7 +57,7 @@ print("...... Tourney Dimension Table Created !!!! . .. ... .. .. .. .. .. .. ..
 #                                                                                   #
 #####################################################################################
 
-country_csv, header  = read_csv('../datasets/cleaned/countries.csv')
-country_dim = create_country_dimension(country_csv)
-write_csv('./dimension tables/country_dim.csv', country_dim[0].keys(), country_dim)
+#country_csv, header  = read_csv('../datasets/cleaned/countries.csv')
+#country_dim = create_country_dimension(country_csv)
+#write_csv('./dimension tables/country_dim.csv', country_dim[0].keys(), country_dim)
 

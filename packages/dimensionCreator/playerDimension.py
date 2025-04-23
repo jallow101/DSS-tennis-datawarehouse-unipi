@@ -6,7 +6,9 @@ def create_player_dim(data):
         'hands': [],
         'ages': [],
         'heights': [],
-        'iocs': []
+        'iocs': [],
+        #'rank_points': [],
+        #'rank': []
     })
 
     for row in data:
@@ -17,6 +19,8 @@ def create_player_dim(data):
             age = row.get(f'{role}_age', 0) or 0
             ht = row.get(f'{role}_ht', 0) or 0
             ioc = row.get(f'{role}_ioc', '').strip()
+            #rank_points = row.get(f'{role}_rank_points', '').strip()
+            #rank = row.get(f'{role}_rank', '').strip()
 
             if pid:
                 if name:
@@ -29,6 +33,10 @@ def create_player_dim(data):
                     player_info[pid]['heights'].append(int(ht))
                 if ioc:
                     player_info[pid]['iocs'].append(ioc)
+                #if rank_points and str(rank_points).isdigit():
+                #    player_info[pid]['rank_points'].append(int(rank_points))
+                #if rank:
+                #    player_info[pid]['rank'].append(rank)
 
     player_dim = []
     for pid, info in player_info.items():
@@ -36,9 +44,11 @@ def create_player_dim(data):
             'player_id': pid,
             'player_name': sorted(info['names'])[0] if info['names'] else 'Unknown',
             'hand': Counter(info['hands']).most_common(1)[0][0] if info['hands'] else 'U',
-            'age': round(sum(info['ages']) / len(info['ages'])) if info['ages'] else 0,
+            'age': max(info['ages'] )if info['ages'] else 18,
             'height': round(sum(info['heights']) / len(info['heights'])) if info['heights'] else 0,
-            'country_id': Counter(info['iocs']).most_common(1)[0][0] if info['iocs'] else 'UNKNW'
+            'country_id': Counter(info['iocs']).most_common(1)[0][0] if info['iocs'] else 'UNKNW',
+         #use in fact ---- #'rank_points': max(info['rank_points']) if info['rank_points'] else 0,
+         #use in fact ---- #'rank': min(info['rank']) if info['rank'] else 9999
         })
 
     return player_dim
